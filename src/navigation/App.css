@@ -1,0 +1,108 @@
+:root {
+  --icon-size: 24px;
+  --text-color: #262626;
+}
+
+#instagram{
+  margin-top : 4.5vh;
+  margin-bottom: 4.5vh;
+  margin-left: 4vh;
+  margin-right: 4vh;
+  fill: white;
+}
+
+.NavigationIcons{
+  transition: transform 0.2s ease-in-out;
+}
+
+button:hover > .NavigationIcons{
+  transform: scale(1.15);
+}
+
+.profileHeadInnerOne .MuiButton-text{
+  margin: 10px;
+}
+
+.navigation{
+  overflow: hidden;
+  position: fixed;
+  width: 16%;
+  height: 100%;
+  background-color: black;
+}
+
+.navigation-middle > div {
+  display: block;
+  width: 88%;
+  cursor: pointer;
+  margin-top : 0.52vh;
+  margin-bottom: 0.52vh;
+  margin-left: 2vh;
+  margin-right: 2vh;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.navigation-middle > div:hover{
+  width: 88%;
+  background-color: rgb(26, 26, 26);
+}
+
+.navigation .NavigationMore{
+  display: block;
+  width: 88%;
+  cursor: pointer;
+  margin-top : 12vh;
+  margin-bottom: 1vh;
+  margin-left: 2vh;
+  margin-right: 2vh;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.NavigationMore:hover{
+  width: 88%;
+  background-color: rgb(26, 26, 26);
+}
+
+.navigation button{
+  width: 100%;
+}
+
+p{
+  color: white;
+}
+
+.blockbutton{
+  cursor: pointer;
+  background: none;
+	border: none;
+	font: inherit;
+  display: inline-flex;   
+  align-items: center;
+  text-align: center;
+  outline:none;
+  overflow: hidden;
+}
+
+.navigation-middle{
+  display: flex;
+  flex-direction: column;
+  align-items: baseline;
+}
+
+@media (max-width: 767px) {
+  .navigation{
+    overflow: hidden;
+    position: fixed;
+    width: 112%;
+    height: 80px;
+    bottom: 0;
+    background-color: black;
+  }
+  .navigation-middle{
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+}

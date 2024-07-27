@@ -1,0 +1,121 @@
+.body {
+  background-color: #000000;
+}
+.postheader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0px;
+}
+
+.stories {
+  margin-top: 40px;
+  padding: 5px 0px;
+  display: flex;
+}
+
+.interactablepost {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.postfootercaption {
+  display: flex;
+}
+
+.post {
+  margin: 30px 0px;
+}
+
+.posts {
+  padding: 0px 67px 0px 56px;
+}
+
+.storyinner {
+  padding: 0px 7px 0px 7px;
+}
+
+.stories img {
+  width: 59px;
+  height: 59px;
+  border: double 3px transparent;
+  border-radius: 50%;
+  background-image: linear-gradient(white, white),
+    radial-gradient(circle at top left, #ff9400, #dc00b4);
+  background-origin: border-box;
+  background-clip: content-box, border-box;
+  display: inline-block;
+}
+
+.storyinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stories p {
+  font-size: 10px;
+}
+
+.postheader img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin: 0px 3px;
+  border: double 3px transparent;
+  border-radius: 50%;
+  background-image: linear-gradient(white, white),
+    radial-gradient(circle at top left, #ff9400, #dc00b4);
+  background-origin: border-box;
+  background-clip: content-box, border-box;
+  display: inline-block;
+}
+
+.postimage img {
+  width: 500px;
+  max-height: 500px;
+  border-radius: 1%;
+}
+
+.postheaderpartone {
+  display: flex;
+  align-items: center;
+}
+
+.postheadertopid {
+  margin: 0px 4px;
+  font-size: 0.95rem;
+  font-weight: 550;
+}
+
+.postheadertopduration {
+  margin: 0px 4px;
+  font-size: 0.9rem;
+  color: #ababab;
+  font-weight: 450;
+}
+
+.individualpost {
+  margin: 15px 0px;
+}
+
+.homeLikeMeter {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.postFooterAccountName {
+  font-size: 0.94rem;
+  font-weight: 500;
+}
+
+.postFooterAccountCaption {
+  font-size: 0.9rem;
+  font-weight: 400;
+  margin: 0px 5px;
+}
+
+.postfootercaption {
+  margin: 3px 0px;
+}

@@ -1,0 +1,162 @@
+.account {
+  position: relative;
+  background-color: #000000;
+  height: 100%;
+}
+
+.account p {
+  color: white;
+}
+
+.accountfooter {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.accountmiddleflex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.accountmiddletext {
+  display: flex;
+  align-items: center;
+}
+
+.accountmiddleflex img {
+  height: 32px;
+  width: 32px;
+  border-radius: 50%;
+}
+
+.accountmiddletextholder p {
+  padding: 0px 10px;
+}
+
+.accountmiddletextholder {
+  padding: 7px 0px;
+}
+
+.account span {
+  color: white;
+}
+
+.accounttoptext {
+  display: flex;
+  align-items: center;
+}
+
+.myaccount {
+  display: flex;
+  padding: 47px 0px 10px 0px;
+  align-items: center;
+  justify-content: space-between;
+  width: 325px;
+}
+
+.myaccount img {
+  height: 59px;
+  width: 59px;
+  border-radius: 50%;
+}
+
+.account-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.myaccountinner {
+  padding: 0px 17px;
+}
+
+.accountfooter {
+  padding: 15px 0px;
+}
+
+.accountswitchbutton {
+  font-size: 0.8rem;
+  color: #0095f6;
+  font-weight: 500;
+  cursor: default;
+}
+
+.accountswitchbutton:active {
+  color: #0266a9;
+}
+
+.accountfooter a {
+  text-decoration: none;
+  color: #4c4c4c;
+  font-size: 0.84rem;
+}
+
+.accountfooter p {
+  text-decoration: none;
+  color: #4c4c4c;
+  font-size: 0.84rem;
+}
+
+.accountfooter a:hover {
+  text-decoration: underline;
+}
+
+.copyrightaccount p {
+  text-decoration: none;
+  color: #4c4c4c;
+  font-size: 0.86rem;
+}
+
+.myAccountInnerID {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.myAccountInnerName {
+  font-size: 0.9rem;
+  font-weight: 440;
+  color: #a8a8a8;
+}
+
+.suggestionsTopText {
+  font-size: 0.9rem;
+  font-weight: 550;
+  color: #a8a8a8;
+}
+
+.suggestionsTopSeeAll {
+  font-size: 0.83rem;
+  font-weight: 500;
+  cursor: default;
+}
+
+.suggestionsTopSeeAll:active {
+  color: #8d8d8d;
+}
+
+.accountMiddleTextHolderID {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.accountMiddleTextHolderName {
+  font-size: 0.86rem;
+  font-weight: 440;
+  color: #a8a8a8;
+}
+
+.accountMiddleFlexFollow {
+  font-size: 0.8rem;
+  color: #0095f6;
+  font-weight: 500;
+  cursor: default;
+}
+
+.accountMiddleFlexFollow:hover {
+  color: #d3eeff;
+}
+
+.accountMiddleFlexFollow:active {
+  color: #0266a9;
+}

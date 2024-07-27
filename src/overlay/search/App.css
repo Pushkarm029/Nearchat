@@ -1,0 +1,98 @@
+.searchOverlay {
+  background-color: #000000;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+  margin-left: 17%;
+  width: 350px;
+}
+
+.searchOverlay .container {
+  text-align: center;
+}
+
+.searchOverlay h1 {
+  color: #fafafa;
+  margin: 30px 5px 20px 0px;
+  font-size: 1.7rem;
+}
+
+.searchOverlay input[type="text"] {
+  background-color: #333;
+  border: none;
+  padding: 10px;
+  color: #fff;
+  border-radius: 5px;
+  width: 300px;
+  margin-bottom: 20px;
+}
+
+.searchOverlay input[type="text"]::placeholder {
+  color: #aaa;
+}
+
+.searchOverlay ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.searchOverlay li {
+  padding: 10px;
+  border-bottom: 1px solid #333;
+}
+
+.searchOverlay li:last-child {
+  border-bottom: none;
+}
+
+/* Hover effect on search results */
+.searchOverlay li:hover {
+  background-color: #444;
+}
+
+.eachSearchResult{
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 14px 0px 14px 0px;
+}
+
+.eachSearchResult img{
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.eachSearchResultLeft{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.eachSearchResultBottom{
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.eachSearchResultTop p{
+  font-size: 0.88rem;
+}
+
+.eachSearchedUserName{
+  font-size: 0.83rem;
+  font-weight: 400;
+  color: #9C9C9C;
+  margin-right: 10px;
+}
+
+.eachSearchedFollowers{
+  font-size: 0.83rem;
+  font-weight: 400;
+  color: #9C9C9C;
+}
