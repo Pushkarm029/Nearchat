@@ -11,8 +11,8 @@ export default function SignIn({onLogin}) {
   }
   return (
     <div className="login-container">
-      <CreateAccountForm onCreateForm={handleCreateNewAccount} />
-      {/* {loginBox ? <LoginBox onCreateForm={handleCreateNewAccount} onLogin={onLogin}/> : <CreateAccountForm onCreateForm={handleCreateNewAccount} />} */}
+      {/* <CreateAccountForm onCreateForm={handleCreateNewAccount} /> */}
+      {loginBox ? <LoginBox onCreateForm={handleCreateNewAccount} onLogin={onLogin}/> : <CreateAccountForm onCreateForm={handleCreateNewAccount} />}
     </div>
   );
 }

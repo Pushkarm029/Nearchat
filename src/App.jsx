@@ -12,11 +12,9 @@ export default function App() {
   };
   return (
     <Provider store={store}>
-      {/* <div className="App">
+      <div className="App">
         {isLogged ? <Navigator /> : <SignIn onLogin={handleLogin} />}
-      </div> */}
-      {/* <Navigator /> */}
-      <SignIn onLogin={handleLogin} />
+      </div>
     </Provider>
   );
 }

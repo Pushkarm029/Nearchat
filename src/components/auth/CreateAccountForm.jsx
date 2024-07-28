@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
+import { invoke } from '@tauri-apps/api/tauri';
 import './CreateAccountForm.css';
-// import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-// import { getFirestore, collection, addDoc } from 'firebase/firestore';
 
 const CreateAccountForm = ({ onCreateForm }) => {
-  const [Name, setName] = useState('');
+  const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [profile_image_link, setProfileURL] = useState('');
-  const [errorMessage, setErrorMessage] = useState("");
-  const [bio, setBio] = useState("");
-  const [link, setBioUrl] = useState("");
+  const [profileImageLink, setProfileImageLink] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [bio, setBio] = useState('');
+  const [link, setBioUrl] = useState('');
+
   const setError = (message) => {
     setErrorMessage(message);
   };
@@ -19,34 +19,29 @@ const CreateAccountForm = ({ onCreateForm }) => {
   const handleClick = () => {
     onCreateForm();
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const auth = getAuth();
-    const db = getFirestore();
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      console.log('New user created:', user);
-      const docRef = await addDoc(collection(db, "users"), {
-        Name,
-        username,
-        email,
-        profile_image_link,
-        bio,
-        link,
-        uid: user.uid
+    try {  
+      const result = await invoke('create_user', {
+        userData: {
+          username,
+          email,
+          name,
+          password,
+          bio,
+          link,
+          profileImageLink,
+        }
       });
-      console.log("Document written with ID: ", docRef.id);
-      setError("Created account successfully. Please Login.")
+      console.log('User created:', result);
+      setError('Created account successfully. Please Login.');
     } catch (error) {
-      console.log(error);
-      if (error.code === "auth/email-already-in-use") {
-        setError("User already exists. Please Login Instead.");
-      } else {
-        setError("An error occurred " + error.code);
-      }
+      console.error('Error creating user:', error);
+      setError('An error occurred: ' + error);
     }
   };
+
   return (
     <div className="create-account-container">
       <div className="create-account-form-container">
@@ -56,7 +51,7 @@ const CreateAccountForm = ({ onCreateForm }) => {
           <input
             type="text" required
             placeholder="Full Name (Required)"
-            value={Name}
+            value={name}
             onChange={(e) => setName(e.target.value)}
           />
           <input
@@ -80,8 +75,8 @@ const CreateAccountForm = ({ onCreateForm }) => {
           <input
             type="text"
             placeholder="Profile Picture URL"
-            value={profile_image_link}
-            onChange={(e) => setProfileURL(e.target.value)}
+            value={profileImageLink}
+            onChange={(e) => setProfileImageLink(e.target.value)}
           />
           <input
             type="text"
@@ -105,4 +100,5 @@ const CreateAccountForm = ({ onCreateForm }) => {
     </div>
   );
 };
+
 export default CreateAccountForm;
