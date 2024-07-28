@@ -69,8 +69,7 @@ export default function Create() {
 
   const uploadFileToGoogleCloud = async () => {
     const url = `https://storage.googleapis.com/upload/storage/v1/b/pushkar_insta/o?uploadType=media&name=${fileUploaded.name}`;
-    const token = 'ya29.a0AXooCgvO66NowIr-UT0VFfjKtWcaaiAuceMXPqFRu-qg6j3nj64Ywv4y8GqC8bVpxz3B1p1nS4gHo8F8_8xpUutl3ZHNFo_uX1COQJpF4xEGku6uwGN-dBWhNKSQZm7xmK78IT0BZ3XqWQce-V7i6JIszGnddEmngjy-05LFliN8aCgYKAesSARASFQHGX2Mi8lpWfKt5HdS1T3cjQWFxPg0179';
-    // const token2 = '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';
+    const token = import.meta.env.VITE_GCP_BUCKET;
     const response = await fetch(url, {
       method: 'POST',
       headers: {
