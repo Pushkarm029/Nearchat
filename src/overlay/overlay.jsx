@@ -1,199 +1,133 @@
-import React from "react";
-import { FiMoreHorizontal } from "react-icons/fi";
-import { AiOutlineHeart } from "react-icons/ai";
-import { FiMessageSquare } from "react-icons/fi";
+import React, { useState, useEffect, useRef } from "react";
+import { FiMoreHorizontal, FiMessageSquare, FiBookmark } from "react-icons/fi";
+import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { RiShareForwardLine } from "react-icons/ri";
-import { FiBookmark } from "react-icons/fi";
+import { BsEmojiLaughing } from "react-icons/bs";
 import "./overlay.css";
 import { useNavigate } from "react-router-dom";
-import { BsEmojiLaughing } from "react-icons/bs";
-import { useState } from "react";
-import { AiFillHeart } from "react-icons/ai"
 import { useSelector } from 'react-redux';
-import { useRef } from "react";
-import { useEffect } from "react";
-
-// current idea to implement overlay is that it will be a component that is called when a post is clicked on and will be passed the post data as props
-// so overlayTest need some props to be passed to it
+import { invoke } from '@tauri-apps/api/tauri';
 
 export function OverlayTest({ OverAcID, OverAcCaption, OverAcLikes, OverAcImages, onStateChange, OverAcEmail }) {
     const [liked, setLiked] = useState(false);
     const userEmail = useSelector((state) => state.user.userEmail);
     const navigate = useNavigate();
     const inputRef = useRef(null);
+    const [commentData, setCommentData] = useState([]);
+
     const handleNavigateToProfile = () => {
         navigate(`/profile?prop=${OverAcEmail}`);
     };
-    const postLikeUpdateData = {
-        likes: OverAcLikes,
-        operation: "like",
-    }
-    const postDisLikeUpdateData = {
-        likes: OverAcLikes,
-        operation: "dislike",
-    }
-    // to shorten the image link
-    const modifiedUrl = OverAcImages.replace('https://firebasestorage.googleapis.com/v0/b/insta-clone-app-91650.appspot.com/o/', '');
+
     const likeHandler = async () => {
         try {
-            // Toggle the liked state using the callback form of setLiked
-            setLiked((prevLiked) => !prevLiked);
-            // Use the updated liked state to determine postUpdateData
-            const postUpdateData = liked ? postDisLikeUpdateData : postLikeUpdateData;
-            const response = await fetch(`/api/like/${OverAcEmail}/${encodeURIComponent(modifiedUrl)}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(postUpdateData),
+            const newLiked = !liked;
+            setLiked(newLiked);
+            const operation = newLiked ? "like" : "dislike";
+            await invoke('like_handler', { 
+                userMail: userEmail, 
+                imageUrl: OverAcImages, 
+                likeData: { likes: OverAcLikes, operation } 
             });
-            if (response.ok) {
-                console.log('Data posted successfully to the backend!');
-            } else {
-                // Handle error response from the backend
-                console.error('Error posting data:', response.statusText);
-            }
-            // No need to setLiked(true) here, as it was already updated with the callback form
         } catch (error) {
-            console.error('Error posting data:', error);
+            console.error('Error handling like:', error);
         }
     };
-    const [commentData, setCommentData] = useState([[]]);
+
     const handleCommentPost = async (e) => {
         e.preventDefault();
         const inputValue = inputRef.current.value;
-        const postCommentData = {
-            comment: inputValue,
-            currentUser: userEmail,
-        }
-        // console.log(postCommentData)
         try {
-            const response = await fetch(`/api/comment/post/${OverAcEmail}/${encodeURIComponent(modifiedUrl)}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(postCommentData),
+            await invoke('add_comment_handler', {
+                userMail: userEmail,
+                imageUrl: OverAcImages,
+                commentReq: { comment: inputValue, current_user: userEmail }
             });
-
-            if (response.ok) {
-                console.log(postCommentData);
-                if (!commentData) {
-                    setCommentData([postCommentData]);
-                } else {
-                    setCommentData(prevComments => [...prevComments, postCommentData]);
-                }
-                inputRef.current.value = '';
-                console.log('Data posted successfully to the backend!');
-            } else {
-                console.error('Error posting data:', response.statusText);
-            }
+            setCommentData(prevComments => [...prevComments, { comment: inputValue, username: userEmail }]);
+            inputRef.current.value = '';
         } catch (error) {
-            console.error('Error posting data:', error);
+            console.error('Error posting comment:', error);
         }
-    }
-    useEffect(() => {
-        const abortController = new AbortController();
-        const signal = abortController.signal;
-        const urlModEncoder = encodeURIComponent(modifiedUrl);
-        fetch(`/api/comment/get/${OverAcEmail}/${urlModEncoder}`, {
-            headers: {
-                Accept: 'application/json',
-            },
-            signal,
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log('API Response Data:', data);
-                setCommentData(data);
-            })
-            .catch(error => {
-                console.error('Error fetching images links:', error);
-                setCommentData([[]]);
-            });
+    };
 
-        return () => {
-            abortController.abort();
+    useEffect(() => {
+        const fetchComments = async () => {
+            try {
+                const comments = await invoke('getting_comments', {
+                    userMail: OverAcEmail,
+                    imageUrl: OverAcImages
+                });
+                setCommentData(comments);
+            } catch (error) {
+                console.error('Error fetching comments:', error);
+            }
         };
-    }, []);
+        fetchComments();
+    }, [OverAcEmail, OverAcImages]);
+
     return (
         <div className="overlay">
             <div className="overlaybg" onClick={onStateChange}></div>
             <div className="overlayInner">
                 <div className="overlayLeft">
-                    <img
-                        src={OverAcImages}
-                        alt="test"
-                    />
+                    <img src={OverAcImages} alt="post" />
                 </div>
-                <hr color="#262626" align="center"></hr>
+                <hr color="#262626" align="center" />
                 <div className="overlayRight">
                     <div className="overlayRightTT">
                         <div className="overlayRightTop">
                             <div className="overlayRightTopLeft">
-                                {/* API call for profile image */}
-                                <img
-                                    src="https://images.unsplash.com/photo-1686452975139-bbb8846dd7e9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=464&q=80"
-                                    alt="profileimg"
-                                />
+                                <img src="placeholder_profile_image_url" alt="profileimg" />
                                 <div className="overlayRightTM">
                                     <p onClick={handleNavigateToProfile} className="overlayUsername">{OverAcID}</p>
                                     <p className="overlayRightTopText">Location</p>
                                 </div>
                             </div>
-                            <FiMoreHorizontal size={25} color="white" style={{ paddingLeft: '7px', paddingRight: '7px', paddingTop: '7px', paddingBottom: '7px' }} />
+                            <FiMoreHorizontal size={25} color="white" style={{ padding: '7px' }} />
                         </div>
-                        <hr color="#262626" align="center"></hr>
+                        <hr color="#262626" align="center" />
                         <div className="overlayRightMiddle">
-                            <img
-                                src="https://images.unsplash.com/photo-1686452975139-bbb8846dd7e9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=464&q=80"
-                                alt="profileimg"
-                            />
+                            <img src="placeholder_profile_image_url" alt="profileimg" />
                             <div className="overlayRightMiddleRight">
                                 <p onClick={handleNavigateToProfile} className="overlayUsername">{OverAcID}</p>
-                                <p className="overlayRightTopText">
-                                    {OverAcCaption}
-                                </p>
+                                <p className="overlayRightTopText">{OverAcCaption}</p>
                                 <p className="overlayDuration">1 w</p>
                             </div>
                         </div>
                     </div>
                     <div className="overlayRightCommentSection">
-                        {commentData && commentData.map((eachCommentPacket) => (
-                            <div className="eachCommentBox">
-                                {/* currently placeholder */}
-                                <img src="https://images.unsplash.com/photo-1690907932520-8ac437939237?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=771&q=80" />
+                        {commentData.map((comment, index) => (
+                            <div key={index} className="eachCommentBox">
+                                <img src="placeholder_profile_image_url" alt="profile" />
                                 <div className="eachCommentText">
-                                    <p className="usernameEachComment"><strong>{eachCommentPacket.currentUser}</strong></p>
-                                    <p className="commentEachComment">{eachCommentPacket.comment}</p>
+                                    <p className="usernameEachComment"><strong>{comment.username}</strong></p>
+                                    <p className="commentEachComment">{comment.comment}</p>
                                 </div>
                             </div>
                         ))}
                     </div>
-                    {/* create comment section where data is commentData */}
                     <div className="overlayRightBottom">
-                        <hr color="#262626" align="center"></hr>
+                        <hr color="#262626" align="center" />
                         <div className="overlayRightBottomTop">
                             <div className="ORBTL">
                                 {liked ? (
-                                    <AiFillHeart onClick={likeHandler} size={25} color="white" style={{ paddingLeft: '7px', paddingRight: '7px', paddingTop: '7px', paddingBottom: '7px' }} />
+                                    <AiFillHeart onClick={likeHandler} size={25} color="white" style={{ padding: '7px' }} />
                                 ) : (
-                                    <AiOutlineHeart onClick={likeHandler} size={25} color="white" style={{ paddingLeft: '7px', paddingRight: '7px', paddingTop: '7px', paddingBottom: '7px' }} />
+                                    <AiOutlineHeart onClick={likeHandler} size={25} color="white" style={{ padding: '7px' }} />
                                 )}
-                                <FiMessageSquare size={25} color="white" style={{ paddingLeft: '7px', paddingRight: '7px', paddingTop: '7px', paddingBottom: '7px' }} />
-                                <RiShareForwardLine size={25} color="white" style={{ paddingLeft: '7px', paddingRight: '7px', paddingTop: '7px', paddingBottom: '7px' }} />
+                                <FiMessageSquare size={25} color="white" style={{ padding: '7px' }} />
+                                <RiShareForwardLine size={25} color="white" style={{ padding: '7px' }} />
                             </div>
                             <div className="ORBTR">
-                                <FiBookmark size={25} color="white" style={{ paddingLeft: '7px', paddingRight: '7px', paddingTop: '7px', paddingBottom: '7px' }} />
+                                <FiBookmark size={25} color="white" style={{ padding: '7px' }} />
                             </div>
                         </div>
                         <div className="overlayRightBottomMiddle">
-                            <p className="overlayRightBottomMiddleText">{liked ? (parseInt(OverAcLikes) + 1) : (OverAcLikes)} likes</p>
-                            {/*currently i will only show no of likes */}
+                            <p className="overlayRightBottomMiddleText">{liked ? (parseInt(OverAcLikes) + 1) : OverAcLikes} likes</p>
                         </div>
-                        <hr color="#262626" align="center"></hr>
+                        <hr color="#262626" align="center" />
                         <form onSubmit={handleCommentPost} className="overlayRightBottomBottom">
-                            <BsEmojiLaughing size={25} color="white" style={{ paddingLeft: '7px', paddingRight: '7px', paddingTop: '7px', paddingBottom: '7px' }} />
+                            <BsEmojiLaughing size={25} color="white" style={{ padding: '7px' }} />
                             <input ref={inputRef} type="text" placeholder="Add a Comment..." />
                             <button className="commentPostButton">Post</button>
                         </form>

@@ -6,6 +6,7 @@ import { TbMessageCircle2Filled } from "react-icons/tb";
 import { useSelector } from "react-redux";
 import { useLocation } from 'react-router-dom';
 import { OverlayTest as ShowOverlay } from "../overlay/overlay.jsx";
+import { invoke } from '@tauri-apps/api/tauri';
 
 function CountPosts({ post }) {
   let index = 0;
@@ -28,31 +29,20 @@ export default function Profile() {
   const [userPosts, setUserPosts] = useState([]);
   const userEmail = useSelector((state) => state.user.userEmail);
   const userID = propEmail ? propEmail : userEmail;
+
   useEffect(() => {
-    const abortController = new AbortController();
-    const signal = abortController.signal;
-    fetch(`/api/profile/user/${userID}`, {
-      headers: {
-        Accept: 'application/json',
-      },
-      signal,
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log('API Response Data:', data);
-        setUserData(data.userData);
-        setUserPosts(data.userPosts);
+    invoke('current_user_handler', { userEmail: userID })
+      .then((response) => {
+        setUserData(response.user_data);
+        setUserPosts(response.user_posts);
       })
-      .catch(error => {
-        console.error('Error fetching images links:', error);
+      .catch((error) => {
+        console.error('Error fetching user data:', error);
         setUserData({});
         setUserPosts([]);
       });
-
-    return () => {
-      abortController.abort();
-    };
   }, [userID]);
+
   const [followed, setFollowed] = useState(false);
   const postFollowerUpdateData = {
     targetfollowers: userData.followers,
@@ -65,7 +55,7 @@ export default function Profile() {
 
   const handleFollow = async () => {
     try {
-      setFollowed((prevLiked) => !prevLiked);
+      setFollowed((prevFollowed) => !prevFollowed);
       const postUpdateData = !followed ? postFollowerUpdateData : postUnfollowUpdateData;
       const response = await fetch(`/api/follow/${propEmail}/${userEmail}`, {
         method: 'POST',
@@ -74,31 +64,21 @@ export default function Profile() {
         },
         body: JSON.stringify(postUpdateData),
       });
-      if (response.ok) {
-        console.log('Data posted successfully to the backend!');
-      } else {
-        // Handle error response from the backend
+      if (!response.ok) {
         console.error('Error posting data:', response.statusText);
       }
-      // No need to setLiked(true) here, as it was already updated with the callback form
     } catch (error) {
       console.error('Error posting data:', error);
     }
   };
-  const [ShowOverlayState, setShowOverlayState] = useState([
-    false,
-    "",
-    "",
-    "",
-    "",
-    "",
-  ]);
-  const [showOverlay, overlayId, overlayCaption, overlayLikes, overlayImageID, overlayEmail] =
-    ShowOverlayState;
+
+  const [ShowOverlayState, setShowOverlayState] = useState([false, "", "", "", "", ""]);
+  const [showOverlay, overlayId, overlayCaption, overlayLikes, overlayImageID, overlayEmail] = ShowOverlayState;
 
   const handleOverlayStateChange = () => {
     setShowOverlayState((prevState) => [!prevState[0], ...prevState.slice(1)]);
   };
+
   return (
     <div className="profile">
       <div className="profileHead">
@@ -108,9 +88,9 @@ export default function Profile() {
         <div className="profileHeadInner">
           <div className="profileHeadInnerOne">
             <p className="usernameProfile">{userData.username}</p>
-            {propEmail && propEmail !== userEmail ? (followed ?
-              <p className="unfollowButtonProfile" onClick={handleFollow}>UnFollow</p>
-              :
+            {propEmail && propEmail !== userEmail ? (
+              followed ?
+              <p className="unfollowButtonProfile" onClick={handleFollow}>UnFollow</p> :
               <p className="followButtonProfile" onClick={handleFollow}>Follow</p>
             ) : (
               <p className="unfollowButtonProfile" variant="text">Edit Profile</p>
@@ -123,11 +103,11 @@ export default function Profile() {
               <p>posts</p>
             </div>
             <div className="profileHeadIITTwo">
-              <div className="profileFollowers">{userData.followersList ? userData.followersList.length : (0)}</div>
+              <div className="profileFollowers">{userData.followersList ? userData.followersList.length : 0}</div>
               <p>followers</p>
             </div>
             <div className="profileHeadIITThree">
-              <div className="profileFollowing">{userData.followingList ? userData.followingList.length : (0)}</div>
+              <div className="profileFollowing">{userData.followingList ? userData.followingList.length : 0}</div>
               <p>following</p>
             </div>
           </div>
@@ -142,7 +122,6 @@ export default function Profile() {
           </div>
         </div>
       </div>
-      {/* <div className="savedStories"></div> */}
       <div className="ProfilePost">
         {showOverlay && (
           <ShowOverlay
@@ -158,16 +137,14 @@ export default function Profile() {
           userPosts.map((profileAccountPosts, index) => (
             <div
               key={index}
-              onClick={() =>
-                setShowOverlayState([
-                  true,
-                  userData.username,
-                  profileAccountPosts.caption,
-                  profileAccountPosts.like,
-                  profileAccountPosts.image_link,
-                  userID,
-                ])
-              }
+              onClick={() => setShowOverlayState([
+                true,
+                userData.username,
+                profileAccountPosts.caption,
+                profileAccountPosts.like,
+                profileAccountPosts.image_link,
+                userID,
+              ])}
               onMouseEnter={() => setHoverProfileIMG(index)}
               onMouseLeave={() => setHoverProfileIMG(null)}
               className="profileImages"
@@ -181,15 +158,16 @@ export default function Profile() {
                     </div>
                     <div className="hoverOverlayComment">
                       <TbMessageCircle2Filled size={25} color="white" />
-                      {profileAccountPosts.comments && profileAccountPosts.comments.length > 0 ? (<p>{profileAccountPosts.comments.length}</p>) : (<p>0</p>)}
+                      {profileAccountPosts.comments && profileAccountPosts.comments.length > 0 ? (
+                        <p>{profileAccountPosts.comments.length}</p>
+                      ) : (
+                        <p>0</p>
+                      )}
                     </div>
                   </div>
                 </div>
               )}
-              <img
-                src={profileAccountPosts.image_link}
-                alt={profileAccountPosts.caption}
-              />
+              <img src={profileAccountPosts.image_link} alt={profileAccountPosts.caption} />
             </div>
           ))
         ) : (

@@ -12,7 +12,7 @@ struct AppState {
     db: sea_orm::DatabaseConnection,
 }
 use sea_orm::{
-    ActiveModelTrait, Database, DatabaseConnection, DbErr, EntityTrait, QueryFilter, QuerySelect,
+    ActiveModelTrait, Database, DbErr, EntityTrait, QueryFilter, QuerySelect,
     RelationTrait, Set,
 };
 
@@ -34,7 +34,7 @@ async fn main() -> Result<(), DbErr> {
             like_handler,
             search_users_handler,
             updated_followers_n_following_func,
-            upload_post_to_firestore
+            upload_post
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -263,7 +263,7 @@ async fn add_comment_handler(
     state: State<'_, AppState>,
     user_mail: String,
     image_url: String,
-    post: AddCommentRequest,
+    comment_req: AddCommentRequest,
 ) -> Result<String, String> {
     let db = &state.db;
 
@@ -281,16 +281,10 @@ async fn add_comment_handler(
         .map_err(|e| e.to_string())?
         .ok_or_else(|| "Post not found".to_string())?;
 
-    // let new_comment = comments::ActiveModel {
-    //     post_id: Set(Some(post.id)),
-    //     user_id: Set(Some(user.id)),
-    //     comment: Set(post.comment),
-    //     ..Default::default()
-    // };
     let new_comment = comments::ActiveModel {
         post_id: Set(Some(post.id)),
         user_id: Set(Some(user.id)),
-        // comment: Set(post.comment.clone()),
+        comment: Set(comment_req.comment.clone()),  // Add this line
         ..Default::default()
     };
 
@@ -551,17 +545,22 @@ async fn updated_followers_n_following_func(
     Ok("Follower relationship updated successfully".to_string())
 }
 
+#[derive(Debug, Deserialize)]
+pub struct UploadPostRequest {
+    pub user_mail: String,
+    pub base64_image: String,
+    pub caption: Option<String>,
+}
+
 #[tauri::command]
-async fn upload_post_to_firestore(
+async fn upload_post(
     state: State<'_, AppState>,
-    user_mail: String,
-    download_url: String,
-    caption: String,
+    uploadData: UploadPostRequest,
 ) -> Result<String, String> {
     let db = &state.db;
 
     let user = Users::find()
-        .filter(users::Column::Email.eq(user_mail))
+        .filter(users::Column::Email.eq(uploadData.user_mail.clone()))
         .one(db)
         .await
         .map_err(|e| e.to_string())?
@@ -569,8 +568,8 @@ async fn upload_post_to_firestore(
 
     let new_post = posts::ActiveModel {
         user_id: Set(Some(user.id)),
-        image_link: Set(download_url),
-        caption: Set(Some(caption)),
+        image_link: Set(uploadData.base64_image),
+        caption: Set(uploadData.caption),
         ..Default::default()
     };
 

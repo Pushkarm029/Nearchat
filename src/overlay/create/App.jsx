@@ -1,90 +1,94 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
-import { useState } from 'react';
 import { BiArrowBack } from 'react-icons/bi';
-// import { getApp } from "firebase/app";
-// import { getStorage } from "firebase/storage";
-// import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useSelector } from 'react-redux';
+import { invoke } from '@tauri-apps/api/tauri';
+import { useNavigate } from 'react-router-dom';
+
 
 export default function Create() {
-  const firebaseApp = getApp();
-  const storage = getStorage(firebaseApp, "gs://insta-clone-app-91650.appspot.com");
-  const [caption, setCaption] = useState(null);
-  // const [downloadURL, setDownloadURL] = useState(null);
+  const [caption, setCaption] = useState('');
   const [imagePreview, setImagePreview] = useState(null);
-  // const [imageUploaded, setImageUploaded] = useState(false);
   const [fileUploaded, setFileUploaded] = useState(null);
   const userEmail = useSelector((state) => state.user.userEmail);
+  const navigate = useNavigate();
+
+  if (!userEmail) {
+    console.error('User email is missing');
+    return null;
+  }
 
   const handleImageUpload = (e) => {
-    if (e.target.files[0]) {
-      const file = e.target.files[0];
+    const file = e.target.files[0];
+    if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
-      // setImageUploaded(true);
-      setFileUploaded(e.target.files[0]);
+      setFileUploaded(file);
     }
   };
+
   const submitPost = async (e) => {
     e.preventDefault();
-    const storageRef = ref(storage, `images/${userEmail}` + Date.now());
+
+    if (!fileUploaded) {
+      console.error('No file uploaded');
+      return;
+    }
 
     try {
-      // Upload the image to Firebase Storage
-      const snapshot = await uploadBytes(storageRef, fileUploaded);
-      console.log('Uploaded file!');
-
-      // Get the download URL of the uploaded image
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      console.log('Image download URL:', downloadURL);
-      // setDownloadURL(downloadURL);
-
-      // Call the backend with the downloadURL and caption data
-      const userData = { downloadURL, caption };
-      processToBackend(userData);
-
+      const uploadResponse = await uploadFileToGoogleCloud();
+      if (uploadResponse.ok) {
+        const uploadResult = await uploadResponse.json();
+        const userData = { user_mail: userEmail, base64_image: uploadResult.mediaLink, caption };
+        console.log('Image uploaded:', uploadResult);
+        console.log(userData);
+        await processToBackend(userData);
+        console.log('Navigating to Profile');
+        navigate('/Profile', { replace: true });
+      } else {
+        console.error('Error uploading image:', uploadResponse.statusText);
+      }
     } catch (error) {
-      console.error('Error uploading image or getting download URL:', error);
+      console.error('Error uploading image:', error);
     }
-    console.log('Post submitted');
   };
 
   const processToBackend = async (userData) => {
     try {
-      const response = await fetch(`/api/upload/${userEmail}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
+      const response = await invoke('upload_post', {
+        uploadData: userData,
       });
-
-      if (response.ok) {
-        console.log('Data posted successfully to the backend!');
-      } else {
-        // Handle error response from the backend
-        console.error('Error posting data:', response.statusText);
-      }
+      console.log(response);
     } catch (error) {
       console.error('Error posting data:', error);
     }
   };
 
+  const uploadFileToGoogleCloud = async () => {
+    const url = `https://storage.googleapis.com/upload/storage/v1/b/pushkar_insta/o?uploadType=media&name=${fileUploaded.name}`;
+    const token = 'ya29.a0AXooCgvO66NowIr-UT0VFfjKtWcaaiAuceMXPqFRu-qg6j3nj64Ywv4y8GqC8bVpxz3B1p1nS4gHo8F8_8xpUutl3ZHNFo_uX1COQJpF4xEGku6uwGN-dBWhNKSQZm7xmK78IT0BZ3XqWQce-V7i6JIszGnddEmngjy-05LFliN8aCgYKAesSARASFQHGX2Mi8lpWfKt5HdS1T3cjQWFxPg0179';
+    // const token2 = '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';
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': fileUploaded.type,
+      },
+      body: fileUploaded,
+    });
+
+    return response;
+  };
 
   return (
     <div className="insta-overlay">
       <div className="headerUploadOverlay">
         <BiArrowBack size={25} />
-        <p className='headerUploadOverlayText'>
-          Create New Post
-        </p>
-        <p onClick={submitPost} className='headerUploadOverlayButton'>
-          Share
-        </p>
+        <p className="headerUploadOverlayText">Create New Post</p>
+        <p onClick={submitPost} className="headerUploadOverlayButton">Share</p>
       </div>
       <div className="bodyUploadOverlay">
         <div className="left-section">
@@ -93,13 +97,15 @@ export default function Create() {
           )}
         </div>
         <div className="right-section">
-          {fileUploaded &&
-            (<textarea
+          {fileUploaded && (
+            <textarea
               className="caption-input"
-              placeholder="Add Write a Caption..."
+              placeholder="Add a Caption..."
               rows="4"
+              value={caption}
               onChange={(e) => setCaption(e.target.value)}
-            ></textarea>)}
+            />
+          )}
           <div className="upload-image-section">
             <label htmlFor="image-upload" className="upload-label">
               {fileUploaded ? "Change Image" : "Upload Image"}
@@ -115,4 +121,4 @@ export default function Create() {
       </div>
     </div>
   );
-};
+}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { invoke } from '@tauri-apps/api/tauri';
 import "./App.css";
 import { useNavigate } from "react-router-dom";
 
@@ -9,31 +10,22 @@ export default function SearchPage() {
   const [userData, setUserData] = useState([]);
 
   useEffect(() => {
-    const abortController = new AbortController();
-    const signal = abortController.signal;
-    fetch(`/api/search/users`, {
-      headers: {
-        Accept: "application/json",
-      },
-      signal,
-    })
-      .then((response) => response.json())
-      .then((data) => {
+    const fetchUserData = async () => {
+      try {
+        const data = await invoke('search_users_handler');
         setUserData(data);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Error fetching user data:", error);
         setUserData([]);
-      });
-
-    return () => {
-      abortController.abort();
+      }
     };
+
+    fetchUserData();
   }, []);
 
   useEffect(() => {
     const filteredData = userData.filter((item) =>
-      item[0].toLowerCase().includes(searchQuery.toLowerCase())
+      item.username.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredResults(filteredData);
   }, [searchQuery, userData]);
@@ -63,22 +55,22 @@ export default function SearchPage() {
             <div className="searchResults">
               {filteredResults.map((result, index) => (
                 <div
-                  onClick={() => handleNavigation(result[4])}
+                  onClick={() => handleNavigation(result.email)}
                   className="eachSearchResult"
                   key={index}
                   data-testid="search-box-result"
                 >
-                  <img src={result[3]} alt={`Result ${index}`} />
+                  <img src={result.profile_image_link} alt={`Result ${index}`} />
                   <div className="eachSearchResultLeft">
                     <div className="eachSearchResultTop">
                       <p>
-                        <strong>{result[0]}</strong>
+                        <strong>{result.username}</strong>
                       </p>
                     </div>
                     <div className="eachSearchResultBottom">
-                      <p className="eachSearchedUserName" data-testid="search-results">{result[2]}</p>
+                      <p className="eachSearchedUserName" data-testid="search-results">{result.name}</p>
                       <p className="eachSearchedFollowers">
-                        {result[1]} Followers
+                        {result.followers_count} Followers
                       </p>
                     </div>
                   </div>

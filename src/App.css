@@ -118,7 +118,7 @@ button {
 .App {
   display: flex;
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
   margin: -8px;
   background-color: black;
   -webkit-user-select: none;
