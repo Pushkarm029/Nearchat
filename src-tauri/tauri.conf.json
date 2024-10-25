@@ -16,10 +16,10 @@
       "icons/icon.ico"
     ]
   },
-  "productName": "video",
-  "mainBinaryName": "video",
+  "productName": "nearchat",
+  "mainBinaryName": "nearchat",
   "version": "0.0.0",
-  "identifier": "com.tauri.dev",
+  "identifier": "com.nearchat.chat",
   "plugins": {},
   "app": {
     "security": {
@@ -27,7 +27,7 @@
     },
     "windows": [
       {
-        "title": "video",
+        "title": "nearchat",
         "width": 1920,
         "height": 1080
       }
