@@ -43,7 +43,7 @@ jobs:
               librsvg2-dev
 
       - name: Install frontend dependencies
-        run: npm install
+        run: bun install
 
       - name: Build
-        run: npm run tauri build
+        run: bun run tauri build
