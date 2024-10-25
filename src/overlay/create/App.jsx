@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './App.css';
 import { BiArrowBack } from 'react-icons/bi';
 import { useSelector } from 'react-redux';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { useNavigate } from 'react-router-dom';
 
 

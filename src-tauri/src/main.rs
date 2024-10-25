@@ -12,8 +12,7 @@ struct AppState {
     db: sea_orm::DatabaseConnection,
 }
 use sea_orm::{
-    ActiveModelTrait, Database, DbErr, EntityTrait, QueryFilter, QuerySelect,
-    RelationTrait, Set,
+    ActiveModelTrait, Database, DbErr, EntityTrait, QueryFilter, QuerySelect, RelationTrait, Set,
 };
 
 #[tokio::main]
@@ -22,6 +21,7 @@ async fn main() -> Result<(), DbErr> {
     let db = Database::connect(db_url).await?;
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_shell::init())
         .manage(AppState { db })
         .invoke_handler(tauri::generate_handler![
             create_user,
@@ -284,7 +284,7 @@ async fn add_comment_handler(
     let new_comment = comments::ActiveModel {
         post_id: Set(Some(post.id)),
         user_id: Set(Some(user.id)),
-        comment: Set(comment_req.comment.clone()),  // Add this line
+        comment: Set(comment_req.comment.clone()), // Add this line
         ..Default::default()
     };
 

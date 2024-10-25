@@ -6,7 +6,7 @@ import { BsEmojiLaughing } from "react-icons/bs";
 import "./overlay.css";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from 'react-redux';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 
 export function OverlayTest({ OverAcID, OverAcCaption, OverAcLikes, OverAcImages, onStateChange, OverAcEmail }) {
     const [liked, setLiked] = useState(false);

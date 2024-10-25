@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { AiFillHeart } from 'react-icons/ai';
 import { TbMessageCircle2Filled } from 'react-icons/tb';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import './App.css';
 import { OverlayTest as ShowOverlay } from '../overlay/overlay.jsx';
 

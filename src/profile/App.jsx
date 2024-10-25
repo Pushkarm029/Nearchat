@@ -6,7 +6,7 @@ import { TbMessageCircle2Filled } from "react-icons/tb";
 import { useSelector } from "react-redux";
 import { useLocation } from 'react-router-dom';
 import { OverlayTest as ShowOverlay } from "../overlay/overlay.jsx";
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/core';
 
 function CountPosts({ post }) {
   let index = 0;
