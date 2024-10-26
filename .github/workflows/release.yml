@@ -47,6 +47,10 @@ jobs:
       - name: Install frontend dependencies
         run: bun install
       
+      - name: Update Tauri version
+        run: |
+          sed -i "s/\"version\": \"[^\"]*\"/\"version\": \"${{ env.VERSION }}\"/" src-tauri/tauri.conf.json
+      
       - name: Build for release
         uses: tauri-apps/tauri-action@v0
         env:
@@ -57,16 +61,3 @@ jobs:
           releaseBody: 'See the assets to download this version and install.'
           releaseDraft: true
           prerelease: false
-      
-      - name: Upload release bundles
-        if: success()
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            src-tauri/target/release/bundle/deb/nearchat_${{ env.VERSION }}_amd64.deb
-            src-tauri/target/release/bundle/rpm/nearchat-${{ env.VERSION }}-1.x86_64.rpm
-            src-tauri/target/release/bundle/appimage/nearchat_${{ env.VERSION }}_amd64.AppImage
-          tag_name: ${{ github.ref_name }}
-          draft: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
