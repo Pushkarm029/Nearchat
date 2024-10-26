@@ -6,6 +6,7 @@
     "devUrl": "http://localhost:1420"
   },
   "bundle": {
+    "createUpdaterArtifacts": true,
     "active": true,
     "targets": "all",
     "icon": [
@@ -20,7 +21,17 @@
   "mainBinaryName": "nearchat",
   "version": "0.0.1",
   "identifier": "com.nearchat.chat",
-  "plugins": {},
+  "plugins": {
+    "updater": {
+      "windows": {
+        "installMode": "passive"
+      },
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDIwNDAwNDVDNkZDMkZBRjUKUldUMStzSnZYQVJBSUlNWldFaDJaMTJ3VWFodkJnMlJwVjNSNk9YWnFCT2F0RzFGUkNxOUQ3TWEK",
+      "endpoints": [
+        "https://github.com/pushkarm029/nearchat/releases/latest/download/latest.json"
+      ]
+    }
+  },
   "app": {
     "security": {
       "csp": null

@@ -4,7 +4,7 @@ use sea_orm::ColumnTrait;
 use sea_orm::PaginatorTrait;
 use serde::{Deserialize, Serialize};
 use tauri::State;
-
+// use tauri_plugin_updater::UpdaterExt;
 mod entities;
 use entities::{comments, followers, posts, prelude::*, users};
 
@@ -21,6 +21,7 @@ async fn main() -> Result<(), DbErr> {
     let db = Database::connect(db_url).await?;
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_shell::init())
         .manage(AppState { db })
         .invoke_handler(tauri::generate_handler![
